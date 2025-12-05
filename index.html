@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="theme-color" content="#121212">
+<link rel="manifest" href="manifest.json">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Amateur Radio Exam Practice</title>
@@ -1956,5 +1958,17 @@ document.getElementById('mobileToggle').addEventListener('click',()=>{
     ☕ Buy me a coffee
   </a>
 </div>
+
+<script>
+// PWA service worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.error('Service worker registration failed:', err);
+    });
+  });
+}
+</script>
+
 </body>
 </html>
