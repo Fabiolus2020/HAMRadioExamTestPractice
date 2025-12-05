@@ -206,10 +206,10 @@ You may use, share, and adapt it for personal or educational, non-commercial pur
 
 
 Questions, suggestions, or feature ideas?
-Feel free to open an issue or reach out through GitHub.
+Feel free to contact me
 
 Fabien
-the_fabiolous@hotmail.com
+fabien.clermont@gmail.com
 ______________________________________________________________________________
 
 
@@ -421,7 +421,7 @@ Vous pouvez l’utiliser, le partager et l’adapter à des fins personnelles ou
 📬 Contact
 
 
-Pour toute question ou suggestion, veuillez ouvrir un billet (issue) sur GitHub.
+Pour toute question ou suggestion
 
 Fabien
-the_fabiolous@hotmail.com
+fabien.clermont@gmail.com
