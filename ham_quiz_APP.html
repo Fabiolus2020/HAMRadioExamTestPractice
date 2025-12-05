@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Amateur Radio Exam Practice</title>
 <style>
@@ -91,40 +92,195 @@ font-size: 0.95rem;
 font-size: 0.9rem;
 color: #555;
 }
+
+/* Dark mode */
+body.dark {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+body.dark .option-label {
+  background:#1e1e1e;
+  border-color:#444;
+}
+body.dark .option-label.correct { background:#2d6a2d; }
+body.dark .option-label.incorrect { background:#6a2d2d; }
+
+
+/* Mobile Mode: optimized layout for phones */
+body.mobile-mode {
+  max-width: 100%;
+  margin: 0;
+  padding: 8px;
+  font-size: 16px;
+}
+
+body.mobile-mode h1 {
+  font-size: 1.4rem;
+}
+
+body.mobile-mode .card {
+  margin-top: 12px;
+  padding: 12px;
+}
+
+body.mobile-mode .controls {
+  flex-direction: column;
+}
+
+body.mobile-mode .controls button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.mobile-mode button {
+  font-size: 16px;
+  padding: 10px 16px;
+}
+
+body.mobile-mode #modeControls label {
+  display: block;
+  margin: 4px 0;
+}
+
+
+#modeIndicator {
+  /* base style handled inline; we only use classes for color */
+}
+
+/* Mode color coding */
+.mode-random {
+  color: #0066cc;
+}
+.mode-norepeat {
+  color: #b8860b;
+}
+.mode-exam {
+  color: #cc0000;
+}
+
+
+
+/* Weak areas spotlight */
+.weak-area-item {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.weak-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: #ffe0e0;
+  color: #a00000;
+}
+
+.weak-practice-btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #888;
+  background: #f9f9f9;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+body.dark .weak-badge {
+  background: #5a1a1a;
+  color: #ffe0e0;
+}
+
+body.dark .weak-practice-btn {
+  background: #333;
+  border-color: #aaa;
+  color: #eee;
+}
+
+
+/* Progress bar */
+#progressContainer {
+  margin: 6px 0 8px 0;
+}
+
+#progressLabel {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+#progressBarOuter {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#progressBarInner {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+  transition: width 0.2s ease-out;
+}
+
+/* Recent accuracy dots */
+#recentAccuracy {
+  margin: 6px 0 4px 0;
+  font-size: 0.85rem;
+}
+
+#recentAccuracy span.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+
+#recentAccuracy span.correct-dot {
+  background: #2e7d32;
+}
+
+#recentAccuracy span.incorrect-dot {
+  background: #c62828;
+}
+
 </style>
 </head>
 <body>
+<button id="darkToggle" style="position:fixed;top:10px;right:10px;z-index:999;">Dark Mode</button>
+<button id="mobileToggle" style="position:fixed;top:50px;right:10px;z-index:999;">Mobile Mode</button>
 <h1>Amateur Radio Exam Practice</h1>
 
-
 <div class="card">
-  <p><strong>Step 1:</strong> Load the official ISED Basic question bank file
-    <code>amat_basic_quest_delim.txt</code> or a compatible CSV file.</p>
-  <p><strong>Step 2:</strong> Choose your preferred language (English or Français).</p>
-  <p><strong>Step 3:</strong> Select the question mode (Random, No repeats, or Exam 100-question subset).</p>
-  <p><strong>Step 4:</strong> Click &quot;Next Question&quot; to start the quiz.</p>
-
-  <p><strong>Language:</strong>
-    <label style="margin-left:8px;">
-      <input type="radio" name="language" id="langEn" value="en" checked> English
-    </label>
-    <label style="margin-left:10px;">
-      <input type="radio" name="language" id="langFr" value="fr"> Français
-    </label>
-  </p>
-
-  <input type="file" id="fileInput" accept=".txt,.csv">
-  <div id="status">No file loaded.</div>
-
-  <div id="modeControls" style="margin-top:8px;">
-    <strong>Question mode:</strong>
-    <label><input type="radio" name="mode" id="modeRandom" value="random" checked> Random</label>
-    <label style="margin-left: 10px;"><input type="radio" name="mode" id="modeNoRepeat" value="norepeat"> No repeats until all questions used</label>
-    <label style="margin-left: 10px;"><input type="radio" name="mode" id="modeExam" value="exam"> <span id="examLabelText">Exam (official structure: 100 questions)</span></label>
+  <p id="step1Text"><strong>Step 1:</strong> Choose your preferred language.</p>
+  <div id="languageControls" style="margin-bottom:10px;">
+    <label><input type="radio" name="lang" id="langEn" value="en" checked> English</label>
+    <label style="margin-left: 10px;"><input type="radio" name="lang" id="langFr" value="fr"> Français</label>
   </div>
 
-  <div id="profileIndicator" style="margin-top:6px; font-size:0.9rem; color:#333;">
-    Profile: Not detected yet.
+  <p id="step2Text"><strong>Step 2:</strong> Load the official ISED question bank file <code>amat_basic_quest_delim.txt</code> or a compatible CSV file.</p>
+
+  <p id="step3Text"><strong>Step 3:</strong> Select the desired question mode (Random, No repeats, or Exam).</p>
+  <p id="step4Text"><strong>Step 4:</strong> Click <em>Next Question</em> to start the quiz.</p>
+
+  <input type="file" id="fileInput" accept=".csv,.txt">
+  <div id="status">No file loaded.</div>
+  <div id="modeControls" style="margin-top:8px;">
+    <strong id="modeLabel">Question mode:</strong>
+    <label><input type="radio" name="mode" id="modeRandom" value="random" checked> <span id="labelRandom">Random</span></label>
+    <label style="margin-left: 10px;"><input type="radio" name="mode" id="modeNoRepeat" value="norepeat"> <span id="labelNoRepeat">No repeats until all questions used</span></label>
+    <label style="margin-left: 10px;"><input type="radio" name="mode" id="modeExam" value="exam"> <span id="labelExam">Exam (up to 100 questions)</span></label>
+    <label style="margin-left: 10px;"><input type="radio" name="mode" id="modeCategory" value="category"> <span id="labelCategory">Category training</span></label>
+  </div>
+  <p id="profileIndicator" style="margin-top:6px;font-style:italic;"></p>
+  <p id="modeIndicator" style="margin-top:4px;font-style:italic;"></p>
+  <div id="categoryTrainingContainer" style="margin-top:8px; display:none;">
+    <strong id="categoryTrainingTitle">Category training</strong>
+    <div id="categoryCheckboxes" style="margin-top:4px;"></div>
+    <p id="categoryHint" style="font-size:0.85rem; margin-top:4px;"></p>
   </div>
 </div>
 
@@ -132,6 +288,16 @@ color: #555;
 <div id="questionHeader">
 <span id="questionCounter"></span>
 </div>
+
+<!-- Progress & motivation UI -->
+<div id="progressContainer">
+  <div id="progressLabel"></div>
+  <div id="progressBarOuter">
+    <div id="progressBarInner"></div>
+  </div>
+</div>
+<div id="recentAccuracy"></div>
+
 <div id="bankQuestionId"></div>
 <div id="questionText"></div>
 <form id="optionsForm">
@@ -150,86 +316,365 @@ color: #555;
 <div id="categoryReport"></div>
 </div>
 
-<div class="card" id="wrongCard" style="display:none;">
-<h3>Wrong Questions Tracker</h3>
-<p id="wrongInfo">You haven’t missed any questions yet.</p>
-<button id="downloadWrongBtn" disabled>Download wrong questions CSV</button>
-</div>
 
 
 <script>
-// ===============================
-// Amateur Radio Exam Practice App
-// Now supports:
-// - Official ISED bilingual file: amat_basic_quest_delim.txt
-// - Existing CSV banks (vertical or horizontal)
-// - Language toggle: English / Français
-// ===============================
-
-// Data structure for each question:
+// Data structure:
 // {
-//   bankID,
-//   category,           // "001".."008" if BankQuestionID present
-//   bilingual: true/false,
-//   question_en,
-//   question_fr,        // may be null
-//   options_en: [4],
-//   options_fr: [4] | null,
-//   correctIndex: 0..3,
-//   explanation: string,
-//   raw: { ... }        // used for wrong-question export
+// bankID, // BankQuestionID (string, may be empty)
+// question,
+// options: [A,B,C,D],
+// correctIndex,
+// explanation,
+// raw: {
+// bankID,
+// question,
+// optionA,
+// optionB,
+// optionC,
+// optionD,
+// correctLetter,
+// explanation
 // }
-
+// }
 let questions = [];
 let currentQuestionIndex = null;
 let totalAsked = 0;
 let totalCorrect = 0;
 
-let wrongQuestions = []; // raw objects
+let recentResults = []; // store last 20 results as booleans
 
-// Category definitions (from ISED exam structure)
+let wrongQuestionIndices = new Set(); // indices of questions answered incorrectly
 
-// Basic exam categories
+let categorySelection = new Set(); // selected category codes for training mode
+
+// Exam profile: 'basic' (B-xxx IDs), 'advanced' (A-xxx IDs), or 'basic' by default
+let examProfile = 'basic';
+
+// Category definitions: bilingual labels for BASIC and ADVANCED
 const CATEGORY_INFO_BASIC = {
-  '001': 'Regulations and Policies',
-  '002': 'Operating and Procedures',
-  '003': 'Station Assembly, Practice and Safety',
-  '004': 'Circuit Components',
-  '005': 'Basic Electronics and Theory',
-  '006': 'Feedlines and Antenna Systems',
-  '007': 'Radio Wave Propagation',
-  '008': 'Interference and Suppression'
+  '001': { en: 'Regulations and Policies', fr: 'Règlements et politiques' },
+  '002': { en: 'Operating and Procedures', fr: 'Exploitation et procédures' },
+  '003': { en: 'Station Assembly, Practice and Safety', fr: 'Montage de la station, pratique et sécurité' },
+  '004': { en: 'Circuit Components', fr: 'Composants de circuits' },
+  '005': { en: 'Basic Electronics and Theory', fr: 'Électronique de base et théorie' },
+  '006': { en: 'Feedlines and Antenna Systems', fr: 'Lignes d’alimentation et systèmes d’antenne' },
+  '007': { en: 'Radio Wave Propagation', fr: 'Propagation des ondes radio' },
+  '008': { en: 'Interference and Suppression', fr: 'Brouillage et suppression' }
 };
 
-// Advanced exam categories
 const CATEGORY_INFO_ADVANCED = {
-  '001': 'Advanced Theory',
-  '002': 'Advanced Components and Circuits',
-  '003': 'Measurements',
-  '004': 'Power Supplies',
-  '005': 'Transmitters, Modulation and Processing',
-  '006': 'Receivers',
-  '007': 'Feedlines - Matching and Antenna Systems'
+  '001': { en: 'Advanced Theory', fr: 'Théorie avancée' },
+  '002': { en: 'Advanced Components and Circuits', fr: 'Composants et circuits avancés' },
+  '003': { en: 'Measurements', fr: 'Mesures' },
+  '004': { en: 'Power Supplies', fr: 'Alimentations' },
+  '005': { en: 'Transmitters, Modulation and Processing', fr: 'Émetteurs, modulation et traitement' },
+  '006': { en: 'Receivers', fr: 'Récepteurs' },
+  '007': { en: 'Feedlines, Matching and Antenna Systems', fr: 'Lignes d’alimentation, adaptation et systèmes d’antenne' }
 };
 
-// Active category mapping (defaults to Basic)
-let CATEGORY_INFO = CATEGORY_INFO_BASIC;
+function getCurrentCategoryInfo() {
+  return examProfile === 'advanced' ? CATEGORY_INFO_ADVANCED : CATEGORY_INFO_BASIC;
+}
+
+function buildCategoryTrainingUI() {
+  if (!categoryTrainingContainer || !categoryCheckboxesEl) return;
+  const catInfo = getCurrentCategoryInfo();
+  categoryCheckboxesEl.innerHTML = '';
+  categorySelection = new Set();
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+
+  // Build a checkbox for each known category
+  for (const code in catInfo) {
+    const labelObj = catInfo[code];
+    const labelText = labelObj ? (labelObj[currentLanguage] || labelObj.en) : code;
+    const wrapper = document.createElement('label');
+    wrapper.style.display = 'block';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = code;
+    cb.className = 'cat-checkbox';
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        categorySelection.add(code);
+      } else {
+        categorySelection.delete(code);
+      }
+    });
+    const span = document.createElement('span');
+    span.textContent = ' ' + code + ' - ' + labelText;
+    wrapper.appendChild(cb);
+    wrapper.appendChild(span);
+    categoryCheckboxesEl.appendChild(wrapper);
+  }
+  // Do NOT change visibility here; that is handled by updateCategoryTrainingVisibility()
+}
+
+function updateCategoryTrainingVisibility() {
+  if (typeof categoryTrainingContainer === 'undefined' || !categoryTrainingContainer) return;
+  if (selectionMode === 'category' && questions && questions.length > 0) {
+    categoryTrainingContainer.style.display = 'block';
+  } else {
+    categoryTrainingContainer.style.display = 'none';
+  }
+}
+
+// Per-exam category statistics
 
 // Per-exam category statistics
 let categoryStats = {};
+let cycleAnsweredCount = 0;
 
-// Active exam distribution and target question count.
-// These are chosen automatically based on the loaded bank (Basic vs Advanced).
-let activeExamDistribution = null;
-let examQuestionTarget = 100;
+let currentLanguage = 'en';
+let selectionMode = 'random';
+let questionSequence = [];
+let questionSequencePosition = 0;
+let isMobileMode = false;
 
-// Language toggle
-let currentLanguage = 'en'; // 'en' or 'fr'
+const UI_STRINGS = {
+  en: {
+    title: 'Amateur Radio Exam Practice',
+    step1: 'Step 1: Choose your preferred language.',
+    step2: 'Step 2: Load the official ISED question bank file amat_basic_quest_delim.txt or a compatible CSV file.',
+    step3: 'Step 3: Select the desired question mode (Random, No repeats, or Exam).',
+    step4: 'Step 4: Click "Next Question" to start the quiz.',
+    modeLabel: 'Question mode:',
+    randomLabel: 'Random',
+    noRepeatLabel: 'No repeats until all questions used',
+    examLabelBasic: 'Exam (official structure: 100 questions)',
+    examLabelAdvanced: 'Exam (official structure: 50 questions)',
+    statusNoFile: 'No file loaded.',
+    statusExamMode: 'Exam mode: official exam-style question set selected from the loaded bank.',
+    statusNoValid: 'No valid questions found in the file. Check the format.',
+    statusErrorFile: 'Error reading the file. Check the format and try again.',
+    statusExamComplete: 'Exam complete: you have answered all questions in this exam set.',
+    statusAllSeen: 'You have seen all questions once. Starting a new shuffled cycle.',
+    feedbackCorrect: 'Correct!',
+    feedbackIncorrect: 'Incorrect.',
+    explanationLabel: 'Explanation:',
+    wrongNone: 'You haven’t missed any questions yet.',
+    wrongSome: 'You have missed {N} unique question(s). You can download them as a CSV and re-upload later to practice only those.',
+    wrongTitle: 'Wrong Questions Tracker',
+    wrongDownload: 'Download wrong questions CSV',
+    scorePrefix: 'Score',
+    progressLabel: 'Progress',
+    progressExamSuffix: ' (exam set)',
+    progressNoRepeatSuffix: ' (cycle)',
+    progressRandomSuffix: '',
+    recentAccuracyLabel: 'Recent answers (last 20):',
+    passHonours: ' — Pass with honours: ',
+    pass: ' — Pass: ',
+    belowPass: ' — Fail: ',
+    catBreakdownTitle: 'Category Breakdown',
+    catColCategory: 'Category',
+    catColCorrect: 'Correct Answers',
+    catColQuestions: 'Questions',
+    catColPercent: 'Percent',
+    weakAreasTitle: 'Weak areas (below 70%)',
+    weakAreasNone: 'No weak areas detected — great work!',
+    weakBadgePrefix: 'Weak area detected: ',
+    weakPracticeBtn: 'Practice only this category',
+    retakeWrongTitle: 'Retake wrong questions',
+    retakeWrongBtn: 'Retake only wrong questions',
+    retakeWrongDesc: 'Build a new quiz using only the questions you missed in this exam.',
+    statusRetakeWrong: 'Retake mode: practicing only questions you got wrong in the last exam.',
+    selectAnswerPrompt: 'Please select an answer.',
+    loadedMessage: 'Loaded {N} questions. Click "Next Question" to start.',
+    checkBtn: 'Check Answer',
+    nextBtn: 'Next Question',
+    darkToggle: 'Dark Mode',
+    questionCounterLabel: 'Question',
+    mobileOn: 'Mobile Mode',
+    mobileOff: 'Desktop Mode',
+    profileBasic: 'Profile: Basic bank',
+    profileAdvanced: 'Profile: Advanced bank',
+    modeRandomIndicator: '🔄 Current mode: Random',
+    modeNoRepeatIndicator: '♻️ Current mode: No repeats',
+    modeExamIndicator: '🎯 Current mode: Exam',
+    modeCategoryIndicator: '📚 Current mode: Category training',
+    modeWrongOnlyIndicator: '🔁 Current mode: Retake wrong questions',
+    categoryLabel: 'Category training',
+    categoryTrainingTitle: 'Category training (by topic)',
+    categoryHint: 'Select one or more categories (e.g., only Regulations, only Antennas, only Propagation), then click \"Next Question\".',
+    supportTitle: 'About & Support',
+    supportText: 'This free bilingual HAM exam trainer was created to help students prepare using real-style questions, official exam structures, and category statistics. If this app helps you, you can support future improvements.',
+    supportButton: '☕ Buy me a coffee',
+    supportButtonUrl: 'https://buymeacoffee.com/fabiolus',
+  },
+  fr: {
+    title: 'Pratique pour l’examen de radioamateur',
+    step1: 'Étape 1 : Choisissez la langue de votre choix.',
+    step2: 'Étape 2 : Chargez le fichier officiel de la banque de questions d’ISDE amat_basic_quest_delim.txt ou un fichier CSV compatible.',
+    step3: 'Étape 3 : Sélectionnez le mode de questions souhaité (Aléatoire, Sans répétition ou Examen).',
+    step4: 'Étape 4 : Cliquez sur « Question suivante » pour commencer le quiz.',
+    modeLabel: 'Mode de questions :',
+    randomLabel: 'Aléatoire',
+    noRepeatLabel: 'Sans répétition jusqu’à ce que toutes les questions soient utilisées',
+    examLabelBasic: 'Examen (structure officielle : 100 questions)',
+    examLabelAdvanced: 'Examen (structure officielle : 50 questions)',
+    statusNoFile: 'Aucun fichier chargé.',
+    statusExamMode: 'Mode examen : ensemble de questions de style officiel sélectionné à partir de la banque chargée.',
+    statusNoValid: 'Aucune question valide trouvée dans le fichier. Vérifiez le format.',
+    statusErrorFile: 'Erreur lors de la lecture du fichier. Vérifiez le format et réessayez.',
+    statusExamComplete: 'Examen terminé : vous avez répondu à toutes les questions de cet ensemble.',
+    statusAllSeen: 'Vous avez vu toutes les questions une fois. Démarrage d’un nouveau cycle mélangé.',
+    feedbackCorrect: 'Bonne réponse !',
+    feedbackIncorrect: 'Mauvaise réponse.',
+    explanationLabel: 'Explication :',
+    wrongNone: 'Vous n’avez encore manqué aucune question.',
+    wrongSome: 'Vous avez manqué {N} question(s) unique(s). Vous pouvez les télécharger en CSV et les recharger plus tard pour pratiquer seulement celles-ci.',
+    wrongTitle: 'Suivi des mauvaises réponses',
+    wrongDownload: 'Télécharger les questions ratées en CSV',
+    scorePrefix: 'Résultat',
+    progressLabel: 'Progression',
+    progressExamSuffix: ' (ensemble d’examen)',
+    progressNoRepeatSuffix: ' (cycle)',
+    progressRandomSuffix: '',
+    recentAccuracyLabel: 'Réponses récentes (20 dernières) :',
+    passHonours: ' — Réussite avec mention : ',
+    pass: ' — Réussite : ',
+    belowPass: ' — Échec : ',
+    catBreakdownTitle: 'Répartition par catégorie',
+    catColCategory: 'Catégorie',
+    catColCorrect: 'Bonnes réponses',
+    catColQuestions: 'Questions',
+    catColPercent: 'Pourcentage',
+    weakAreasTitle: 'Points faibles (moins de 70 %)',
+    weakAreasNone: 'Aucun point faible détecté — excellent travail !',
+    retakeWrongTitle: 'Revoir les mauvaises réponses',
+    retakeWrongBtn: 'Reprendre seulement les mauvaises réponses',
+    retakeWrongDesc: 'Créer un nouveau quiz uniquement avec les questions ratées lors de cet examen.',
+    statusRetakeWrong: 'Mode révision : vous pratiquez seulement les questions ratées lors du dernier examen.',
+    selectAnswerPrompt: 'Veuillez sélectionner une réponse.',
+    loadedMessage: 'Chargé {N} questions. Cliquez sur « Question suivante » pour commencer.',
+    checkBtn: 'Vérifier la réponse',
+    nextBtn: 'Question suivante',
+    darkToggle: 'Mode sombre',
+    questionCounterLabel: 'Question',
+    mobileOn: 'Mode mobile',
+    mobileOff: 'Mode standard',
+    profileBasic: 'Profil : Banque de base',
+    profileAdvanced: 'Profil : Banque avancée',
+    modeRandomIndicator: '🔄 Mode actuel : Aléatoire',
+    modeNoRepeatIndicator: '♻️ Mode actuel : Sans répétition',
+    modeExamIndicator: '🎯 Mode actuel : Examen',
+    modeCategoryIndicator: '📚 Mode actuel : Entraînement par catégorie',
+    modeWrongOnlyIndicator: '🔁 Mode actuel : Révision des erreurs',
+    categoryLabel: 'Entraînement par catégorie',
+    categoryTrainingTitle: 'Entraînement par catégorie (par thème)',
+    categoryHint: 'Sélectionnez une ou plusieurs catégories (par ex. seulement Règlements, seulement Antennes, seulement Propagation), puis cliquez sur « Question suivante ».',
+    supportTitle: 'À propos et soutien',
+    supportText: 'Cet outil bilingue gratuit pour l’examen de radioamateur a été créé pour aider les étudiantes et étudiants à se préparer avec des questions de style officiel, une structure d’examen réaliste et des statistiques par catégorie. Si cet outil vous aide, vous pouvez soutenir les améliorations futures.',
+    supportButton: '☕ M’offrir un café',
+    supportButtonUrl: 'https://buymeacoffee.com/fabiolus'
+  }
+};
+
+
+
+function updateProfileIndicator() {
+  if (!profileIndicatorEl) return;
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  if (!questions || questions.length === 0) {
+    profileIndicatorEl.textContent = '';
+    return;
+  }
+  if (examProfile === 'advanced') {
+    profileIndicatorEl.textContent = strings.profileAdvanced || '';
+  } else {
+    profileIndicatorEl.textContent = strings.profileBasic || '';
+  }
+}
+
+function updateModeIndicator() {
+  if (!modeIndicatorEl) return;
+  // Only show mode indicator once a bank is loaded
+  if (!questions || questions.length === 0) {
+    modeIndicatorEl.textContent = '';
+    modeIndicatorEl.classList.remove('mode-random', 'mode-norepeat', 'mode-exam', 'mode-category');
+    return;
+  }
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  let textVal = '';
+  let cls = '';
+  if (selectionMode === 'random') {
+    textVal = strings.modeRandomIndicator;
+    cls = 'mode-random';
+  } else if (selectionMode === 'norepeat') {
+    textVal = strings.modeNoRepeatIndicator;
+    cls = 'mode-norepeat';
+  } else if (selectionMode === 'exam') {
+    textVal = strings.modeExamIndicator;
+    cls = 'mode-exam';
+  } else if (selectionMode === 'category') {
+    textVal = strings.modeCategoryIndicator || '';
+    cls = 'mode-category';
+  } else if (selectionMode === 'wrongonly') {
+    textVal = strings.modeWrongOnlyIndicator || '';
+    cls = 'mode-exam';
+  }
+  modeIndicatorEl.textContent = textVal;
+  modeIndicatorEl.classList.remove('mode-random', 'mode-norepeat', 'mode-exam', 'mode-category');
+  if (cls) modeIndicatorEl.classList.add(cls);
+}
+function applyLanguage() {
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  if (appTitleEl) appTitleEl.textContent = strings.title;
+  if (step1TextEl) step1TextEl.innerHTML = '<strong>' + strings.step1.split(':')[0] + ':</strong> ' + strings.step1.split(': ').slice(1).join(': ');
+  if (step2TextEl) step2TextEl.innerHTML = '<strong>' + strings.step2.split(':')[0] + ':</strong> ' + strings.step2.split(': ').slice(1).join(': ');
+  if (step3TextEl) step3TextEl.innerHTML = '<strong>' + strings.step3.split(':')[0] + ':</strong> ' + strings.step3.split(': ').slice(1).join(': ');
+  if (step4TextEl) step4TextEl.innerHTML = '<strong>' + strings.step4.split(':')[0] + ':</strong> ' + strings.step4.split(': ').slice(1).join(': ');
+  if (modeLabelEl) modeLabelEl.textContent = strings.modeLabel;
+  if (labelRandomEl) labelRandomEl.textContent = strings.randomLabel;
+  if (labelNoRepeatEl) labelNoRepeatEl.textContent = strings.noRepeatLabel;
+  if (labelExamEl) {
+    labelExamEl.textContent = examProfile === 'advanced' ? strings.examLabelAdvanced : strings.examLabelBasic;
+  }
+  if (labelCategoryEl && strings.categoryLabel) {
+    labelCategoryEl.textContent = strings.categoryLabel;
+  }
+  if (categoryTrainingTitleEl && strings.categoryTrainingTitle) {
+    categoryTrainingTitleEl.textContent = strings.categoryTrainingTitle;
+  }
+  if (categoryHintEl && strings.categoryHint) {
+    categoryHintEl.textContent = strings.categoryHint;
+  }
+  // Support / About card localization
+  const supportTitleEl = document.getElementById('supportTitle');
+  const supportTextEl = document.getElementById('supportText');
+  const supportButtonEl = document.getElementById('supportButton');
+  if (supportTitleEl && strings.supportTitle) supportTitleEl.textContent = strings.supportTitle;
+  if (supportTextEl && strings.supportText) supportTextEl.textContent = strings.supportText;
+  if (supportButtonEl) {
+    if (strings.supportButton) supportButtonEl.textContent = strings.supportButton;
+    if (strings.supportButtonUrl) supportButtonEl.href = strings.supportButtonUrl;
+  }
+  if (checkBtn) checkBtn.textContent = strings.checkBtn;
+  if (nextBtn) nextBtn.textContent = strings.nextBtn;
+  if (darkToggleBtn) darkToggleBtn.textContent = strings.darkToggle;
+  if (mobileToggleBtn) {
+    mobileToggleBtn.textContent = isMobileMode ? strings.mobileOff : strings.mobileOn;
+  }
+  if (statusEl && totalAsked === 0 && (!questions || questions.length === 0)) {
+    statusEl.textContent = strings.statusNoFile;
+  }
+  // Update profile indicator based on current profile and language
+  updateProfileIndicator();
+  // Update mode indicator based on current mode and language
+  updateModeIndicator();
+  // If questions are loaded and we are in category mode, keep the container visible; otherwise hide it
+  updateCategoryTrainingVisibility();
+  // Update progress & recent accuracy labels for current language
+  updateProgressUI();
+  updateRecentAccuracy();
+  document.documentElement.lang = currentLanguage;
+}
+
+
+
 
 const fileInput = document.getElementById('fileInput');
 const statusEl = document.getElementById('status');
-const profileIndicatorEl = document.getElementById('profileIndicator');
-const examLabelTextEl = document.getElementById('examLabelText');
 const quizCard = document.getElementById('quizCard');
 const bankQuestionIdEl = document.getElementById('bankQuestionId');
 const questionTextEl = document.getElementById('questionText');
@@ -238,49 +683,72 @@ const optionsForm = document.getElementById('optionsForm');
 const feedbackEl = document.getElementById('feedback');
 const explanationEl = document.getElementById('explanation');
 const questionCounterEl = document.getElementById('questionCounter');
+const progressLabelEl = document.getElementById('progressLabel');
+const progressBarInnerEl = document.getElementById('progressBarInner');
+const recentAccuracyEl = document.getElementById('recentAccuracy');
 const scoreEl = document.getElementById('score');
 const checkBtn = document.getElementById('checkBtn');
 const nextBtn = document.getElementById('nextBtn');
 const modeRandomRadio = document.getElementById('modeRandom');
 const modeNoRepeatRadio = document.getElementById('modeNoRepeat');
 const modeExamRadio = document.getElementById('modeExam');
-const wrongCard = document.getElementById('wrongCard');
-const wrongInfoEl = document.getElementById('wrongInfo');
-const downloadWrongBtn = document.getElementById('downloadWrongBtn');
-const categoryReportEl = document.getElementById('categoryReport');
 const langEnRadio = document.getElementById('langEn');
 const langFrRadio = document.getElementById('langFr');
+const appTitleEl = document.querySelector('h1');
+const step1TextEl = document.getElementById('step1Text');
+const step2TextEl = document.getElementById('step2Text');
+const step3TextEl = document.getElementById('step3Text');
+const step4TextEl = document.getElementById('step4Text');
+const modeLabelEl = document.getElementById('modeLabel');
+const labelRandomEl = document.getElementById('labelRandom');
+const labelNoRepeatEl = document.getElementById('labelNoRepeat');
+const labelExamEl = document.getElementById('labelExam');
+const labelCategoryEl = document.getElementById('labelCategory');
+const profileIndicatorEl = document.getElementById('profileIndicator');
+const modeIndicatorEl = document.getElementById('modeIndicator');
+const wrongTitleEl = document.getElementById('wrongTitle');
+const darkToggleBtn = document.getElementById('darkToggle');
+const mobileToggleBtn = document.getElementById('mobileToggle');
+const modeCategoryRadio = document.getElementById('modeCategory');
+const categoryTrainingContainer = document.getElementById('categoryTrainingContainer');
+const categoryCheckboxesEl = document.getElementById('categoryCheckboxes');
+const categoryTrainingTitleEl = document.getElementById('categoryTrainingTitle');
+const categoryHintEl = document.getElementById('categoryHint');
 
-let selectionMode = 'random';
-let questionSequence = [];
-let questionSequencePosition = 0;
-
-// --- Language toggle handlers ---
+// Hook up language radio buttons
 if (langEnRadio && langFrRadio) {
   langEnRadio.addEventListener('change', () => {
     if (langEnRadio.checked) {
       currentLanguage = 'en';
-      refreshCurrentQuestionLanguage();
+      applyLanguage();
+      if (currentQuestionIndex !== null) {
+        // Redraw current question in new language
+        showCurrentQuestionOnly();
+      }
     }
   });
   langFrRadio.addEventListener('change', () => {
     if (langFrRadio.checked) {
       currentLanguage = 'fr';
-      refreshCurrentQuestionLanguage();
+      applyLanguage();
+      if (currentQuestionIndex !== null) {
+        showCurrentQuestionOnly();
+      }
     }
   });
-}
-
-function refreshCurrentQuestionLanguage() {
-  if (currentQuestionIndex === null || questions.length === 0) return;
-  // Re-render current question using the new language,
-  // but without changing which question is being asked.
-  renderQuestion(questions[currentQuestionIndex]);
 }
 
 modeRandomRadio.addEventListener('change', () => {
   if (modeRandomRadio.checked) {
     selectionMode = 'random';
+    const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+    if (questions && questions.length > 0) {
+      statusEl.textContent = strings.loadedMessage.replace('{N}', questions.length);
+    } else {
+      statusEl.textContent = strings.statusNoFile;
+    }
+    updateModeIndicator();
+    updateCategoryTrainingVisibility();
   }
 });
 
@@ -288,6 +756,14 @@ modeNoRepeatRadio.addEventListener('change', () => {
   if (modeNoRepeatRadio.checked) {
     selectionMode = 'norepeat';
     resetQuestionSequence();
+    const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+    if (questions && questions.length > 0) {
+      statusEl.textContent = strings.loadedMessage.replace('{N}', questions.length);
+    } else {
+      statusEl.textContent = strings.statusNoFile;
+    }
+    updateModeIndicator();
+    updateCategoryTrainingVisibility();
   }
 });
 
@@ -297,575 +773,561 @@ modeExamRadio.addEventListener('change', () => {
     // Reset stats for a fresh exam session
     totalAsked = 0;
     totalCorrect = 0;
-    wrongQuestions = [];
+    recentResults = [];
+    wrongQuestionIndices = new Set();
     updateScore();
-    updateWrongInfo();
+    updateRecentAccuracy();
+        updateProgressUI();
     resetQuestionSequence();
     if (categoryReportEl) {
       categoryReportEl.innerHTML = '';
     }
-    statusEl.textContent = `Exam mode: fixed ${examQuestionTarget}-question subset with official category distribution.`;
+    statusEl.textContent = (UI_STRINGS[currentLanguage] || UI_STRINGS.en).statusExamMode;
     nextBtn.disabled = false;
+    updateModeIndicator();
+    updateCategoryTrainingVisibility();
   }
 });
+
+if (modeCategoryRadio) {
+  modeCategoryRadio.addEventListener('change', () => {
+    if (modeCategoryRadio.checked) {
+      selectionMode = 'category';
+      const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+      if (!questions || questions.length === 0) {
+        statusEl.textContent = strings.statusNoFile;
+        updateCategoryTrainingVisibility();
+        return;
+      }
+      // Reset stats like a focused training session, but keep overall totals if desired
+      resetQuestionSequence();
+      statusEl.textContent = strings.loadedMessage.replace('{N}', questions.length);
+      // (Re)build the list of category checkboxes whenever we enter category mode
+      buildCategoryTrainingUI();
+      updateModeIndicator();
+      updateCategoryTrainingVisibility();
+    }
+  });
+}
+
+const categoryReportEl = document.getElementById('categoryReport');
+
+// Initial language apply (now that DOM references are ready)
+applyLanguage();
 
 fileInput.addEventListener('change', handleFileSelect);
 checkBtn.addEventListener('click', handleCheckAnswer);
 nextBtn.addEventListener('click', showNextQuestion);
-downloadWrongBtn.addEventListener('click', downloadWrongQuestionsCsv);
 
-// =====================
-// Generic CSV parser
-// (supports quotes, commas, newlines in fields)
-// =====================
-function parseCsvText(text, delimiter) {
-  delimiter = delimiter || ',';
-  const rows = [];
-  let row = [];
-  let field = '';
-  let inQuotes = false;
+// === Real CSV parser that supports:
+// - commas in fields
+// - quotes
+// - double quotes ("") as escaped quotes
+// - multi-line fields (line breaks inside quoted fields)
+function parseCsvText(text) {
+const rows = [];
+let row = [];
+let field = '';
+let inQuotes = false;
 
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
+for (let i = 0; i < text.length; i++) {
+const ch = text[i];
 
-    if (inQuotes) {
-      if (ch === '"') {
-        // Escaped quote?
-        if (i + 1 < text.length && text[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        field += ch;
-      }
-    } else {
-      if (ch === '"') {
-        inQuotes = true;
-      } else if (ch === delimiter) {
-        row.push(field);
-        field = '';
-      } else if (ch === '\r' || ch === '\n') {
-        row.push(field);
-        field = '';
-        if (row.some(cell => cell.trim() !== '')) {
-          rows.push(row);
-        }
-        row = [];
-        if (ch === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
-          i++;
-        }
-      } else {
-        field += ch;
-      }
-    }
-  }
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    if (row.some(cell => cell.trim() !== '')) {
-      rows.push(row);
-    }
-  }
-  return rows;
+if (inQuotes) {
+if (ch === '"') {
+// Check for escaped quote ("")
+if (i + 1 < text.length && text[i + 1] === '"') {
+field += '"';
+i++; // skip the second quote
+} else {
+inQuotes = false;
+}
+} else {
+field += ch;
+}
+} else {
+if (ch === '"') {
+inQuotes = true;
+} else if (ch === ',') {
+row.push(field);
+field = '';
+} else if (ch === '\r' || ch === '\n') {
+// End of record (if we are not in quotes)
+row.push(field);
+field = '';
+// Only push non-empty rows (or rows with at least one non-empty cell)
+if (row.some(cell => cell.trim() !== '')) {
+rows.push(row);
+}
+row = [];
+// Skip \n after \r for CRLF
+if (ch === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
+i++;
+}
+} else {
+field += ch;
+}
+}
 }
 
-// =====================
-// File handling
-// =====================
+// Last field / last row
+if (field.length > 0 || row.length > 0) {
+row.push(field);
+if (row.some(cell => cell.trim() !== '')) {
+rows.push(row);
+}
+}
+
+return rows;
+}
+
 function handleFileSelect(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+const file = event.target.files[0];
+if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    try {
-      // Decide format based on first non-empty line
-      const firstLine = (text.split(/\r?\n/).find(l => l.trim().length > 0) || '').toLowerCase();
-      if (firstLine.startsWith('question_id')) {
-        // Official ISED bilingual file (.txt)
-        questions = parseOfficialDelimToQuestions(text);
-        statusEl.textContent = `Loaded official ISED bank: ${questions.length} questions (bilingual).`;
-      } else {
-        // Fallback: existing CSV parser
-        questions = parseCsvToQuestions(text);
-        statusEl.textContent = `Loaded CSV bank: ${questions.length} questions.`;
-      }
+const reader = new FileReader();
+reader.onload = function(e) {
+const text = e.target.result;
+try {
+let isTxt = file.name.toLowerCase().endsWith('.txt');
+if (isTxt) {
+  questions = parseISEDDelimitedQuestions(text);
+} else {
+  questions = parseCsvToQuestions(text);
+}
+if (questions.length === 0) {
+const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+statusEl.textContent = strings.statusNoValid;
+quizCard.style.display = 'none';
+} else {
+const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+detectProfileFromQuestions(questions);
+applyLanguage();
+statusEl.textContent = strings.loadedMessage.replace('{N}', questions.length);
+quizCard.style.display = 'block';
 
-      // Configure exam profile (Basic vs Advanced) based on BankQuestionID patterns
-      configureExamProfile();
+totalAsked = 0;
+totalCorrect = 0;
+recentResults = [];
+wrongQuestionIndices = new Set();
+updateScore();
+updateRecentAccuracy();
+updateProgressUI();
 
-      if (questions.length === 0) {
-        statusEl.textContent = 'No valid questions found in the file. Check the format.';
-        quizCard.style.display = 'none';
-        wrongCard.style.display = 'none';
-      } else {
-        quizCard.style.display = 'block';
-        wrongCard.style.display = 'block';
-
-        totalAsked = 0;
-        totalCorrect = 0;
-        wrongQuestions = [];
-        updateScore();
-        updateWrongInfo();
-
-        resetQuestionSequence();
-        resetFeedback();
-        clearQuestion();
-        nextBtn.disabled = false;
-        checkBtn.disabled = true;
-
-        // If the bank is purely English, force English language
-        const anyFrench = questions.some(q => q.question_fr && q.question_fr.trim() !== '');
-        langFrRadio.disabled = !anyFrench;
-        if (!anyFrench) {
-          currentLanguage = 'en';
-          if (langEnRadio) langEnRadio.checked = true;
-          if (langFrRadio) langFrRadio.checked = false;
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = 'Error reading the file. Check the format and try again.';
-      quizCard.style.display = 'none';
-      wrongCard.style.display = 'none';
-    }
-  };
-  reader.readAsText(file);
+resetQuestionSequence();
+resetFeedback();
+clearQuestion();
+nextBtn.disabled = false;
+checkBtn.disabled = true;
+}
+} catch (err) {
+console.error(err);
+statusEl.textContent = (UI_STRINGS[currentLanguage] || UI_STRINGS.en).statusErrorFile;
+quizCard.style.display = 'none';
+}
+};
+reader.readAsText(file);
+}
+function detectProfileFromQuestions(qs) {
+  let hasBasic = false;
+  let hasAdvanced = false;
+  if (!qs) return;
+  for (const q of qs) {
+    if (!q || !q.bankID) continue;
+    if (q.bankID.startsWith('B-')) hasBasic = true;
+    else if (q.bankID.startsWith('A-')) hasAdvanced = true;
+    if (hasBasic && hasAdvanced) break;
+  }
+  if (hasAdvanced && !hasBasic) {
+    examProfile = 'advanced';
+  } else if (hasBasic && !hasAdvanced) {
+    examProfile = 'basic';
+  } else {
+    examProfile = 'basic';
+  }
 }
 
-// =====================
-// Parse official ISED bilingual file (amat_basic_quest_delim.txt)
-// =====================
-function parseOfficialDelimToQuestions(text) {
-  const lines = text.split(/\r?\n/);
+function parseISEDDelimitedQuestions(txt) {
+  const lines = txt.split(/\r?\n/);
+  if (!lines.length) return [];
   const result = [];
-  let headerProcessed = false;
+  // Expect header in lines[0]
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const parts = line.split(';').map(p => p.trim());
+    if (parts.length < 11) continue;
+    const bankID = parts[0];
+    const qEn = parts[1];
+    const correctEn = parts[2];
+    const inc1En = parts[3];
+    const inc2En = parts[4];
+    const inc3En = parts[5];
+    const qFr = parts[6];
+    const correctFr = parts[7];
+    const inc1Fr = parts[8];
+    const inc2Fr = parts[9];
+    const inc3Fr = parts[10];
 
-  for (let line of lines) {
-    if (!line || line.trim().length === 0) continue;
-    if (!headerProcessed) {
-      headerProcessed = true; // skip header row
-      continue;
-    }
-    const cells = line.split(';');
-    if (cells.length < 11) continue;
+    if (!qEn || !correctEn) continue;
 
-    const id = (cells[0] || '').trim();
-    const q_en = (cells[1] || '').trim();
-    const corr_en = (cells[2] || '').trim();
-    const w1_en = (cells[3] || '').trim();
-    const w2_en = (cells[4] || '').trim();
-    const w3_en = (cells[5] || '').trim();
-    const q_fr = (cells[6] || '').trim();
-    const corr_fr = (cells[7] || '').trim();
-    const w1_fr = (cells[8] || '').trim();
-    const w2_fr = (cells[9] || '').trim();
-    const w3_fr = (cells[10] || '').trim();
-
-    if (!q_en || !corr_en) continue;
-
-    const answers = [
-      { en: corr_en, fr: corr_fr, isCorrect: true },
-      { en: w1_en, fr: w1_fr, isCorrect: false },
-      { en: w2_en, fr: w2_fr, isCorrect: false },
-      { en: w3_en, fr: w3_fr, isCorrect: false }
+    const paired = [
+      { en: correctEn, fr: correctFr, isCorrect: true },
+      { en: inc1En, fr: inc1Fr, isCorrect: false },
+      { en: inc2En, fr: inc2Fr, isCorrect: false },
+      { en: inc3En, fr: inc3Fr, isCorrect: false }
     ];
-
-    // Shuffle answers but keep English/French paired
-    const order = [0, 1, 2, 3];
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = order[i];
-      order[i] = order[j];
-      order[j] = tmp;
+    // Shuffle paired options
+    for (let j = paired.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      const tmp = paired[j];
+      paired[j] = paired[k];
+      paired[k] = tmp;
     }
-
-    const options_en = [];
-    const options_fr = [];
-    let correctIndex = null;
-
-    for (let i = 0; i < 4; i++) {
-      const ans = answers[order[i]];
-      options_en[i] = ans.en;
-      options_fr[i] = ans.fr || ans.en; // if French missing, fall back to English
-      if (ans.isCorrect) {
-        correctIndex = i;
-      }
-    }
-
-    if (correctIndex === null) continue;
-
-    const category = getCategoryFromBankID(id);
+    const optionsEn = paired.map(o => o.en);
+    const optionsFr = paired.map(o => o.fr);
+    const correctIndex = paired.findIndex(o => o.isCorrect);
+    const category = getCategoryFromBankID(bankID);
 
     const q = {
-      bankID: id,
-      category: category,
-      bilingual: true,
-      question_en: q_en,
-      question_fr: q_fr || '',
-      options_en: options_en,
-      options_fr: options_fr,
-      correctIndex: correctIndex,
-      explanation: '', // official bank has no explanation text
-      question: q_en, // backward compatibility
-      options: options_en.slice(),
+      bankID,
+      category,
+      question: qEn,
+      question_en: qEn,
+      question_fr: qFr,
+      options: optionsEn,
+      options_en: optionsEn,
+      options_fr: optionsFr,
+      correctIndex,
+      explanation: '',
+      explanation_en: '',
+      explanation_fr: '',
       raw: {
-        bankID: id,
-        category: category,
-        question: q_en,
-        optionA: options_en[0],
-        optionB: options_en[1],
-        optionC: options_en[2],
-        optionD: options_en[3],
+        bankID,
+        category,
+        question: qEn,
+        optionA: optionsEn[0],
+        optionB: optionsEn[1],
+        optionC: optionsEn[2],
+        optionD: optionsEn[3],
         correctLetter: indexToLetter(correctIndex),
         explanation: ''
       }
     };
-
     result.push(q);
   }
   return result;
 }
 
-// =====================
-// Existing CSV parsing (unchanged logic, but extended to fill *_en fields)
-// =====================
 function parseCsvToQuestions(csvText) {
-  const rows = parseCsvText(csvText, ',');
-  const result = [];
-  if (!rows.length) return result;
+const rows = parseCsvText(csvText);
+const result = [];
+if (!rows.length) return result;
 
-  const firstRow = rows[0];
-  const firstCell = (firstRow[0] || '').trim().toLowerCase();
+const firstRow = rows[0];
+const firstCell = (firstRow[0] || '').trim().toLowerCase();
 
-  const isVerticalFormat = firstRow.length >= 2 && firstCell === 'column';
+const isVerticalFormat = firstRow.length >= 2 && firstCell === 'column';
 
-  if (isVerticalFormat) {
-    return parseVerticalQuestions(rows);
-  }
+if (isVerticalFormat) {
+return parseVerticalQuestions(rows);
+}
 
-  // Horizontal format: one row per question
-  let startIndex = 0;
-  if (firstCell.includes('question')) {
-    startIndex = 1; // skip header row
-  }
+// Horizontal format: one row per question
+let startIndex = 0;
+if (firstCell.includes('question')) {
+startIndex = 1; // skip header row
+}
 
-  for (let i = startIndex; i < rows.length; i++) {
-    const cells = rows[i];
-    if (!cells || cells.length < 6) continue;
+for (let i = startIndex; i < rows.length; i++) {
+const cells = rows[i];
+if (!cells || cells.length < 6) continue;
 
-    const question = (cells[0] || '').trim();
-    const optionA = (cells[1] || '').trim();
-    const optionB = (cells[2] || '').trim();
-    const optionC = (cells[3] || '').trim();
-    const optionD = (cells[4] || '').trim();
-    const correct = (cells[5] || '').trim();
-    const explanation = cells[6] ? cells[6].toString() : '';
+const question = (cells[0] || '').trim();
+const optionA = (cells[1] || '').trim();
+const optionB = (cells[2] || '').trim();
+const optionC = (cells[3] || '').trim();
+const optionD = (cells[4] || '').trim();
+const correct = (cells[5] || '').trim();
+const explanation = cells[6] ? cells[6].toString() : '';
 
-    // Optional BankQuestionID (column 8)
-    const bankID = cells[7] ? cells[7].toString().trim() : '';
+// Optional BankQuestionID in horizontal format (column 8)
+const bankID = cells[7] ? cells[7].toString().trim() : '';
 
-    if (!question || !optionA || !optionB || !optionC || !optionD || !correct) {
-      continue;
-    }
+if (!question || !optionA || !optionB || !optionC || !optionD || !correct) {
+continue;
+}
 
-    const correctIndex = letterToIndex(correct);
-    if (correctIndex === null) continue;
-    const correctLetter = indexToLetter(correctIndex);
+const correctIndex = letterToIndex(correct);
+if (correctIndex === null) continue;
+const correctLetter = indexToLetter(correctIndex);
 
-    const category = getCategoryFromBankID(bankID);
+const category = getCategoryFromBankID(bankID);
 
-    const q = {
-      bankID: bankID,
-      category: category,
-      bilingual: false,
-      question_en: question,
-      question_fr: '',
-      options_en: [optionA, optionB, optionC, optionD],
-      options_fr: null,
-      correctIndex: correctIndex,
-      explanation: explanation,
-      question: question,
-      options: [optionA, optionB, optionC, optionD],
-      raw: {
-        bankID: bankID,
-        category: category,
-        question: question,
-        optionA: optionA,
-        optionB: optionB,
-        optionC: optionC,
-        optionD: optionD,
-        correctLetter: correctLetter,
-        explanation: explanation
-      }
-    };
+result.push({
+bankID,
+category,
+question,
+options: [optionA, optionB, optionC, optionD],
+correctIndex,
+explanation,
+raw: {
+bankID,
+category,
+question,
+optionA,
+optionB,
+optionC,
+optionD,
+correctLetter,
+explanation
+}
+});
+}
 
-    result.push(q);
-  }
-
-  return result;
+return result;
 }
 
 // Extract category code (001–008) from BankQuestionID like "B-001-001-002"
 function getCategoryFromBankID(bankId) {
-  if (!bankId) return null;
-  const m = bankId.match(/^[AB]-(\d{3})-/);
-  return m ? m[1] : null;
+if (!bankId) return null;
+const m = bankId.match(/^[BA]-(\d{3})-/);
+return m ? m[1] : null;
 }
 
-
-// Exam distribution definitions for Basic and Advanced banks
-const EXAM_DISTRIBUTION_BASIC = {
-  '001': 25,
-  '002': 9,
-  '003': 21,
-  '004': 6,
-  '005': 13,
-  '006': 13,
-  '007': 8,
-  '008': 5
-};
-
-const EXAM_DISTRIBUTION_ADVANCED = {
-  '001': 5,   // Advanced Theory
-  '002': 12,  // Advanced Components and Circuits
-  '003': 6,   // Measurements
-  '004': 4,   // Power Supplies
-  '005': 9,   // Transmitters, Modulation and Processing
-  '006': 5,   // Receivers
-  '007': 9    // Feedlines - Matching and Antenna Systems
-};
-
-// Decide whether the loaded bank looks like Basic or Advanced,
-// and configure CATEGORY_INFO and exam distribution accordingly.
-function configureExamProfile() {
-  let hasBasic = false;
-  let hasAdvanced = false;
-
-  for (const q of questions) {
-    if (!q || !q.bankID) continue;
-    if (/^B-\d{3}-/.test(q.bankID)) hasBasic = true;
-    if (/^A-\d{3}-/.test(q.bankID)) hasAdvanced = true;
-  }
-
-  let profileName = 'Basic';
-
-  if (hasAdvanced && !hasBasic) {
-    // Advanced-only bank
-    CATEGORY_INFO = CATEGORY_INFO_ADVANCED;
-    activeExamDistribution = EXAM_DISTRIBUTION_ADVANCED;
-    profileName = 'Advanced';
-  } else {
-    // Default to Basic mapping
-    CATEGORY_INFO = CATEGORY_INFO_BASIC;
-    activeExamDistribution = EXAM_DISTRIBUTION_BASIC;
-    profileName = 'Basic';
-  }
-
-  // Target number of questions in an exam is the sum of the active distribution.
-  if (activeExamDistribution) {
-    examQuestionTarget = Object.values(activeExamDistribution).reduce((sum, n) => sum + n, 0);
-  } else {
-    examQuestionTarget = 100;
-  }
-
-  // Update UI indicators if elements exist
-  if (profileIndicatorEl) {
-    profileIndicatorEl.textContent = `Profile: ${profileName} (official structure: ${examQuestionTarget} questions)`;
-  }
-  if (examLabelTextEl) {
-    examLabelTextEl.textContent = `Exam (official structure: ${examQuestionTarget} questions)`;
-  }
-}
-
-// Vertical format: header row "Column,Example", then key/value rows
 // Vertical format: header row "Column,Example", then key/value rows
 function parseVerticalQuestions(rows) {
-  const result = [];
-  let current = null;
+const result = [];
+// rows[0] is header
+let current = null;
 
-  function pushCurrent() {
-    if (!current) return;
-    if (!current.question || !current.optionA || !current.optionB ||
-        !current.optionC || !current.optionD || !current.correctLetter) {
-      return;
-    }
-    const correctIndex = letterToIndex(current.correctLetter);
-    if (correctIndex === null) return;
+function pushCurrent() {
+if (!current) return;
+if (!current.question || !current.optionA || !current.optionB ||
+!current.optionC || !current.optionD || !current.correctLetter) {
+return;
+}
+const correctIndex = letterToIndex(current.correctLetter);
+if (correctIndex === null) return;
 
-    const bankID = current.bankID ? current.bankID.trim() : '';
-    const category = getCategoryFromBankID(bankID);
+const bankID = current.bankID ? current.bankID.trim() : '';
 
-    const options_en = [
-      current.optionA,
-      current.optionB,
-      current.optionC,
-      current.optionD
-    ];
+const category = getCategoryFromBankID(bankID);
 
-    const q = {
-      bankID: bankID,
-      category: category,
-      bilingual: false,
-      question_en: current.question,
-      question_fr: '',
-      options_en: options_en,
-      options_fr: null,
-      correctIndex: correctIndex,
-      explanation: current.explanation || '',
-      question: current.question,
-      options: options_en.slice(),
-      raw: {
-        bankID: bankID,
-        category: category,
-        question: current.question,
-        optionA: current.optionA,
-        optionB: current.optionB,
-        optionC: current.optionC,
-        optionD: current.optionD,
-        correctLetter: indexToLetter(correctIndex),
-        explanation: current.explanation || ''
-      }
-    };
-    result.push(q);
-  }
+const q = {
+bankID,
+category,
+question: current.question,
+options: [current.optionA, current.optionB, current.optionC, current.optionD],
+correctIndex,
+explanation: current.explanation || '',
+raw: {
+bankID,
+category,
+question: current.question,
+optionA: current.optionA,
+optionB: current.optionB,
+optionC: current.optionC,
+optionD: current.optionD,
+correctLetter: indexToLetter(correctIndex),
+explanation: current.explanation || ''
+}
+};
+result.push(q);
+}
 
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-    if (!row || row.length < 2) continue;
+for (let i = 1; i < rows.length; i++) {
+const row = rows[i];
+if (!row || row.length < 2) continue;
 
-    const key = (row[0] || '').trim();
-    const value = (row[1] || '').toString();
+const key = (row[0] || '').trim();
+const value = (row[1] || '').toString(); // may contain \n inside
 
-    if (!key) continue;
+if (!key) continue;
 
-    const keyLower = key.toLowerCase();
-    if (keyLower === 'question') {
-      if (current) pushCurrent();
-      current = {
-        bankID: '',
-        question: value.trim(),
-        optionA: '',
-        optionB: '',
-        optionC: '',
-        optionD: '',
-        correctLetter: '',
-        explanation: ''
-      };
-    } else if (current) {
-      if (keyLower === 'optiona') current.optionA = value.trim();
-      else if (keyLower === 'optionb') current.optionB = value.trim();
-      else if (keyLower === 'optionc') current.optionC = value.trim();
-      else if (keyLower === 'optiond') current.optionD = value.trim();
-      else if (keyLower === 'correctoption') current.correctLetter = value.trim();
-      else if (keyLower === 'explanation') current.explanation = value;
-      else if (keyLower === 'bankquestionid') current.bankID = value.trim();
-    }
-  }
+const keyLower = key.toLowerCase();
+if (keyLower === 'question') {
+// New question; push previous if valid
+if (current) pushCurrent();
+current = {
+bankID: '',
+question: value.trim(),
+optionA: '',
+optionB: '',
+optionC: '',
+optionD: '',
+correctLetter: '',
+explanation: ''
+};
+} else if (current) {
+if (keyLower === 'optiona') current.optionA = value.trim();
+else if (keyLower === 'optionb') current.optionB = value.trim();
+else if (keyLower === 'optionc') current.optionC = value.trim();
+else if (keyLower === 'optiond') current.optionD = value.trim();
+else if (keyLower === 'correctoption') current.correctLetter = value.trim();
+else if (keyLower === 'explanation') current.explanation = value;
+else if (keyLower === 'bankquestionid') current.bankID = value.trim();
+}
+}
 
-  if (current) pushCurrent();
-  return result;
+if (current) pushCurrent();
+return result;
 }
 
 function letterToIndex(letter) {
-  const l = letter.toString().trim().toUpperCase();
-  if (l === 'A') return 0;
-  if (l === 'B') return 1;
-  if (l === 'C') return 2;
-  if (l === 'D') return 3;
-  const num = parseInt(l, 10);
-  if (!isNaN(num) && num >= 0 && num <= 3) return num;
-  return null;
+const l = letter.toString().trim().toUpperCase();
+if (l === 'A') return 0;
+if (l === 'B') return 1;
+if (l === 'C') return 2;
+if (l === 'D') return 3;
+const num = parseInt(l, 10);
+if (!isNaN(num) && num >= 0 && num <= 3) return num;
+return null;
 }
 
 function indexToLetter(index) {
-  return String.fromCharCode(65 + index);
+return String.fromCharCode(65 + index);
 }
 
-// Prepare shuffled sequence of question indices for no-repeat or exam mode
+
+function buildExamQuestionSequence() {
+  if (!questions || questions.length === 0) return [];
+
+  // Build buckets of question indices by category code
+  const catBuckets = {};
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    if (!q || !q.category) continue;
+    if (!catBuckets[q.category]) catBuckets[q.category] = [];
+    catBuckets[q.category].push(i);
+  }
+
+  // Official category quotas for Basic (100 questions) and Advanced (50 questions)
+  const basicQuotas = {
+    '001': 25,
+    '002': 9,
+    '003': 21,
+    '004': 6,
+    '005': 13,
+    '006': 13,
+    '007': 8,
+    '008': 5
+  };
+  const advancedQuotas = {
+    '001': 5,
+    '002': 12,
+    '003': 6,
+    '004': 4,
+    '005': 9,
+    '006': 5,
+    '007': 9
+  };
+
+  const quotas = (examProfile === 'advanced') ? advancedQuotas : basicQuotas;
+
+  // Compute target total from quotas
+  let targetTotal = 0;
+  for (const code in quotas) {
+    targetTotal += quotas[code];
+  }
+
+  // Local shuffle helper
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+  }
+
+  const selected = [];
+  const used = new Set();
+
+  // First, select per-category according to quotas
+  for (const code in quotas) {
+    const needed = quotas[code];
+    const bucket = (catBuckets[code] || []).slice();
+    if (bucket.length === 0 || needed <= 0) continue;
+    shuffle(bucket);
+    const take = Math.min(needed, bucket.length);
+    for (let k = 0; k < take; k++) {
+      const idx = bucket[k];
+      if (!used.has(idx)) {
+        selected.push(idx);
+        used.add(idx);
+      }
+    }
+  }
+
+  // If we didn't reach the official target (e.g. custom/incomplete bank),
+  // fill remaining slots with any leftover questions (any category) at random.
+  if (selected.length < targetTotal) {
+    const remaining = [];
+    for (let i = 0; i < questions.length; i++) {
+      if (!used.has(i)) remaining.push(i);
+    }
+    shuffle(remaining);
+    for (let i = 0; i < remaining.length && selected.length < targetTotal; i++) {
+      selected.push(remaining[i]);
+      used.add(remaining[i]);
+    }
+  }
+
+  // As a final safety, never exceed the total number of available questions.
+  if (selected.length > questions.length) {
+    return selected.slice(0, questions.length);
+  }
+  return selected;
+}
+
+
 function resetQuestionSequence() {
+  // Reset per-cycle answered count for no-repeat and category training
+  if (selectionMode === 'norepeat' || selectionMode === 'category') {
+    cycleAnsweredCount = 0;
+  }
+
+  // Prepare a shuffled sequence of question indices for no-repeat or exam mode
   questionSequence = [];
   questionSequencePosition = 0;
-  if (selectionMode !== 'norepeat' && selectionMode !== 'exam') return;
-  if (!questions || questions.length === 0) return;
-
+  if (selectionMode !== 'norepeat' && selectionMode !== 'exam' && selectionMode !== 'category') {
+    return;
+  }
+  if (!questions || questions.length === 0) {
+    return;
+  }
   const indices = [];
   for (let i = 0; i < questions.length; i++) {
+    if (selectionMode === 'category') {
+      const q = questions[i];
+      if (!q || !q.category || !categorySelection.has(q.category)) continue;
+    }
     indices.push(i);
   }
+  // Fisher-Yates shuffle
   for (let i = indices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     const tmp = indices[i];
     indices[i] = indices[j];
     indices[j] = tmp;
   }
-
   if (selectionMode === 'exam') {
-    // We want fixed distribution across categories (like ISED exam)
-    questionSequence = buildExamSequence(indices);
+    // New exam: clear any previous wrong-question set
+    wrongQuestionIndices = new Set();
+    // Build an exam sequence that matches the official per-category distribution
+    questionSequence = buildExamQuestionSequence();
+    // Initialize per-category totals for the current exam question set
     resetCategoryStatsForExam();
   } else {
     questionSequence = indices;
   }
 }
 
-// Build an exam sequence using the active exam distribution (Basic or Advanced)
-function buildExamSequence(allIndices) {
-  const requiredPerCategory = activeExamDistribution || EXAM_DISTRIBUTION_BASIC;
-
-  const bucket = {};
-  for (const code in requiredPerCategory) {
-    bucket[code] = [];
-  }
-  const uncategorized = [];
-
-  allIndices.forEach(idx => {
-    const q = questions[idx];
-    if (q && q.category && bucket[q.category]) {
-      bucket[q.category].push(idx);
-    } else {
-      uncategorized.push(idx);
-    }
-  });
-
-  const examIndices = [];
-
-  for (const code in requiredPerCategory) {
-    const needed = requiredPerCategory[code];
-    const available = bucket[code] || [];
-
-    // Shuffle each bucket locally
-    for (let i = available.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = available[i];
-      available[i] = available[j];
-      available[j] = tmp;
-    }
-
-    const take = Math.min(needed, available.length);
-    for (let i = 0; i < take; i++) {
-      examIndices.push(available[i]);
-    }
-  }
-
-  // If we don't reach the target due to missing questions,
-  // top up from any remaining questions.
-  const target = examQuestionTarget || 100;
-  const extras = allIndices.filter(idx => !examIndices.includes(idx));
-  for (let i = 0; i < extras.length && examIndices.length < target; i++) {
-    examIndices.push(extras[i]);
-  }
-
-  // If we somehow have more than the target (e.g., overfilled), trim.
-  return examIndices.slice(0, target);
-}
-
-
 function resetCategoryStatsForExam() {
   categoryStats = {};
-  for (const code in CATEGORY_INFO) {
+  const catInfo = getCurrentCategoryInfo();
+  for (const code in catInfo) {
     categoryStats[code] = { correct: 0, total: 0 };
   }
   if (selectionMode === 'exam' && questionSequence && questionSequence.length > 0) {
@@ -878,58 +1340,107 @@ function resetCategoryStatsForExam() {
   }
 }
 
+
 function showNextQuestion() {
-  if (questions.length === 0) return;
+if (questions.length === 0) return;
 
-  resetFeedback();
-  let index;
-
-  if (selectionMode === 'norepeat' || selectionMode === 'exam') {
-    if (!questionSequence || questionSequence.length === 0) {
-      resetQuestionSequence();
-    }
-    if (questionSequence.length === 0) return;
-
-    if (questionSequencePosition >= questionSequence.length) {
-      if (selectionMode === 'exam') {
-        statusEl.textContent = 'Exam complete: you have answered all questions in this exam set.';
-        nextBtn.disabled = true;
-        renderCategoryReport();
-        return;
-      } else {
-        resetQuestionSequence();
-        statusEl.textContent = 'You have seen all questions once. Starting a new shuffled cycle.';
-      }
-    }
-    index = questionSequence[questionSequencePosition++];
-  } else {
-    index = Math.floor(Math.random() * questions.length);
-  }
-
-  currentQuestionIndex = index;
-  const q = questions[index];
-  renderQuestion(q);
+// Guard for category mode: require at least one category
+if (selectionMode === 'category' && (!categorySelection || categorySelection.size === 0)) {
+  alert((UI_STRINGS[currentLanguage] || UI_STRINGS.en).categoryHint || 'Please select one or more categories.');
+  return;
 }
 
-function renderQuestion(q) {
-  if (!q) return;
+resetFeedback();
+let index;
+if (selectionMode === 'norepeat' || selectionMode === 'exam' || selectionMode === 'category') {
+  if (!questionSequence || questionSequence.length === 0) {
+    resetQuestionSequence();
+  }
+  if (questionSequence.length === 0) {
+    return;
+  }
+  if (questionSequencePosition >= questionSequence.length) {
+    if (selectionMode === 'exam') {
+      statusEl.textContent = (UI_STRINGS[currentLanguage] || UI_STRINGS.en).statusExamComplete;
+      nextBtn.disabled = true;
+      return;
+    } else {
+      // All questions have been used once; reshuffle for a new cycle
+      resetQuestionSequence();
+      statusEl.textContent = (UI_STRINGS[currentLanguage] || UI_STRINGS.en).statusAllSeen;
+    }
+  }
+  index = questionSequence[questionSequencePosition++];
+} else {
+  index = Math.floor(Math.random() * questions.length);
+}
+currentQuestionIndex = index;
+const q = questions[index];
 
-  // Show BankQuestionID above the question (if present)
-  if (q.bankID && q.bankID.trim() !== '') {
-    bankQuestionIdEl.textContent = `BankQuestionID: ${q.bankID}`;
-  } else {
-    bankQuestionIdEl.textContent = '';
+
+// Show BankQuestionID above the question (if present)
+if (q.bankID && q.bankID.trim() !== '') {
+bankQuestionIdEl.textContent = `BankQuestionID: ${q.bankID}`;
+} else {
+bankQuestionIdEl.textContent = '';
+}
+
+const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+const qText = (currentLanguage === 'fr' && q.question_fr) ? q.question_fr : (q.question_en || q.question);
+questionTextEl.innerHTML = qText;
+questionCounterEl.textContent = `${strings.questionCounterLabel} ${totalAsked + 1}`;
+optionsEl.innerHTML = '';
+
+const opts = (currentLanguage === 'fr' && q.options_fr && q.options_fr.length === 4)
+  ? q.options_fr
+  : (q.options_en || q.options);
+
+opts.forEach((opt, index) => {
+const id = `opt_${index}`;
+
+const label = document.createElement('label');
+label.className = 'option-label';
+label.setAttribute('data-index', index);
+
+const input = document.createElement('input');
+input.type = 'radio';
+input.name = 'option';
+input.value = index;
+input.id = id;
+
+const letter = String.fromCharCode(65 + index);
+const span = document.createElement('span');
+span.innerHTML = ' ' + letter + ') ' + opt;
+
+label.appendChild(input);
+label.appendChild(span);
+optionsEl.appendChild(label);
+});
+
+checkBtn.disabled = false;
+nextBtn.disabled = true;
+updateProgressUI();
+}
+
+
+function showCurrentQuestionOnly() {
+  if (currentQuestionIndex === null || !questions[currentQuestionIndex]) return;
+  const q = questions[currentQuestionIndex];
+
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  const qText = (currentLanguage === 'fr' && q.question_fr) ? q.question_fr : (q.question_en || q.question);
+  questionTextEl.innerHTML = qText;
+  if (totalAsked > 0) {
+    questionCounterEl.textContent = `${strings.questionCounterLabel} ${totalAsked}`;
   }
 
-  questionTextEl.innerHTML = getQuestionText(q);
-  questionCounterEl.textContent = `Question ${totalAsked + 1}`;
   optionsEl.innerHTML = '';
-
-  const opts = getOptionsArray(q);
+  const opts = (currentLanguage === 'fr' && q.options_fr && q.options_fr.length === 4)
+    ? q.options_fr
+    : (q.options_en || q.options);
 
   opts.forEach((opt, index) => {
     const id = `opt_${index}`;
-
     const label = document.createElement('label');
     label.className = 'option-label';
     label.setAttribute('data-index', index);
@@ -941,243 +1452,419 @@ function renderQuestion(q) {
     input.id = id;
 
     const letter = String.fromCharCode(65 + index);
-    const textNode = document.createTextNode(` ${letter}) ${opt}`);
+    const span = document.createElement('span');
+    span.innerHTML = ' ' + letter + ') ' + opt;
 
     label.appendChild(input);
-    label.appendChild(textNode);
+    label.appendChild(span);
     optionsEl.appendChild(label);
   });
-
-  checkBtn.disabled = false;
-  nextBtn.disabled = true;
-}
-
-function getQuestionText(q) {
-  if (currentLanguage === 'fr' && q.question_fr && q.question_fr.trim() !== '') {
-    return q.question_fr;
-  }
-  return q.question_en || q.question || '';
-}
-
-function getOptionsArray(q) {
-  if (currentLanguage === 'fr' && q.options_fr && Array.isArray(q.options_fr)) {
-    return q.options_fr;
-  }
-  if (q.options_en && Array.isArray(q.options_en)) {
-    return q.options_en;
-  }
-  return q.options || [];
-}
-
-function resetFeedback() {
-  feedbackEl.textContent = '';
-  feedbackEl.className = '';
-  explanationEl.textContent = '';
-}
-
-function clearQuestion() {
-  bankQuestionIdEl.textContent = '';
-  questionTextEl.textContent = '';
-  optionsEl.innerHTML = '';
-  feedbackEl.textContent = '';
-  explanationEl.textContent = '';
-  questionCounterEl.textContent = '';
 }
 
 function handleCheckAnswer(event) {
-  event.preventDefault();
-  if (currentQuestionIndex === null) return;
-  const q = questions[currentQuestionIndex];
+event.preventDefault();
+if (currentQuestionIndex === null) return;
 
-  const selected = optionsForm.querySelector('input[name="option"]:checked');
-  if (!selected) {
-    alert('Please select an answer.');
+const selectedInput = optionsForm.querySelector('input[name="option"]:checked');
+if (!selectedInput) {
+alert((UI_STRINGS[currentLanguage] || UI_STRINGS.en).selectAnswerPrompt);
+return;
+}
+
+const selectedIndex = parseInt(selectedInput.value, 10);
+const q = questions[currentQuestionIndex];
+
+totalAsked++;
+if (selectionMode === 'norepeat' || selectionMode === 'category') {
+  cycleAnsweredCount++;
+}
+const isCorrect = (selectedIndex === q.correctIndex);
+if (isCorrect) {
+ totalCorrect++;
+} else {
+ addWrongQuestion(currentQuestionIndex);
+}
+
+// Track recent results (last 20)
+recentResults.push(isCorrect);
+if (recentResults.length > 20) {
+  recentResults = recentResults.slice(recentResults.length - 20);
+}
+
+// Update per-category stats in exam mode
+if (selectionMode === 'exam' && q && q.category && categoryStats && categoryStats[q.category]) {
+  if (isCorrect) {
+    categoryStats[q.category].correct += 1;
+  }
+}
+
+highlightOptions(selectedIndex, q.correctIndex);
+showFeedback(isCorrect, q);
+
+updateScore();
+updateRecentAccuracy();
+updateProgressUI();
+
+checkBtn.disabled = true;
+nextBtn.disabled = false;
+}
+
+function addWrongQuestion(questionIndex) {
+  if (!wrongQuestionIndices) {
+    wrongQuestionIndices = new Set();
+  }
+  if (typeof questionIndex === 'number' && questionIndex >= 0 && questionIndex < questions.length) {
+    wrongQuestionIndices.add(questionIndex);
+  }
+}
+
+
+function highlightOptions(selectedIndex, correctIndex) {
+const labels = optionsEl.querySelectorAll('.option-label');
+labels.forEach(label => {
+const idx = parseInt(label.getAttribute('data-index'), 10);
+label.classList.remove('correct', 'incorrect');
+
+if (idx === correctIndex) {
+label.classList.add('correct');
+}
+if (idx === selectedIndex && idx !== correctIndex) {
+label.classList.add('incorrect');
+}
+});
+}
+
+
+function showFeedback(isCorrect, questionObj) {
+const fStrings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+feedbackEl.textContent = isCorrect ? fStrings.feedbackCorrect : fStrings.feedbackIncorrect;
+feedbackEl.className = '';
+feedbackEl.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+if (questionObj.explanation) {
+// Render explanation as HTML so tables and formatting work
+const exLabel = fStrings.explanationLabel || 'Explanation:';
+explanationEl.innerHTML = '<strong>' + exLabel + '</strong><br>' + questionObj.explanation;
+} else {
+explanationEl.innerHTML = '';
+}
+}
+
+function updateProgressUI() {
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  if (!progressLabelEl || !progressBarInnerEl) return;
+
+  let labelBase = strings.progressLabel || 'Progress';
+  let suffix = '';
+  let percent = 0;
+
+  if (!questions || questions.length === 0) {
+    progressLabelEl.textContent = '';
+    progressBarInnerEl.style.width = '0%';
     return;
   }
 
-  const selectedIndex = parseInt(selected.value, 10);
-  const correctIndex = q.correctIndex;
+  if (selectionMode === 'exam' && questionSequence && questionSequence.length > 0) {
+    // Exam: progress based on how many questions have actually been answered in this exam set
+    percent = questionSequence.length > 0 ? (totalAsked / questionSequence.length) * 100 : 0;
+    suffix = strings.progressExamSuffix || '';
+  } else if ((selectionMode === 'norepeat' || selectionMode === 'category') && questionSequence && questionSequence.length > 0) {
+    // For cycle modes, show how many questions have actually been ANSWERED in this cycle
+    percent = questionSequence.length > 0 ? (cycleAnsweredCount / questionSequence.length) * 100 : 0;
+    suffix = strings.progressNoRepeatSuffix || '';
+  } else if (selectionMode === 'random') {
+    // Random mode: show coverage of the whole bank
+    percent = questions.length > 0 ? (totalAsked / questions.length) * 100 : 0;
+    suffix = strings.progressRandomSuffix || '';
+  }
 
-  const labels = optionsEl.querySelectorAll('.option-label');
-  labels.forEach(label => {
-    const idx = parseInt(label.getAttribute('data-index'), 10);
-    label.classList.remove('correct', 'incorrect');
-    if (idx === correctIndex) {
-      label.classList.add('correct');
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+
+  if (selectionMode === 'random') {
+    const pctDisplay = isNaN(percent) ? 0 : percent.toFixed(0);
+    progressLabelEl.textContent = `${labelBase}: ${totalAsked}/${questions.length} (${pctDisplay}%)`;
+  } else if (selectionMode === 'norepeat' || selectionMode === 'category' || selectionMode === 'exam') {
+    const pctDisplay = isNaN(percent) ? 0 : percent.toFixed(0);
+    progressLabelEl.textContent = `${labelBase}${suffix}: ${pctDisplay}%`;
+  } else {
+    // Fallback
+    progressLabelEl.textContent = `${labelBase}: ${totalAsked}`;
+  }
+
+  progressBarInnerEl.style.width = isNaN(percent) ? '0%' : percent + '%';
+}
+
+function updateRecentAccuracy() {
+  if (!recentAccuracyEl) return;
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  if (!recentResults || recentResults.length === 0) {
+    recentAccuracyEl.textContent = '';
+    return;
+  }
+  let html = `<div><strong>${strings.recentAccuracyLabel || 'Recent answers'} </strong></div>`;
+  html += '<div>';
+  recentResults.forEach(r => {
+    const cls = r ? 'correct-dot' : 'incorrect-dot';
+    html += `<span class="dot ${cls}"></span>`;
+  });
+  html += '</div>';
+  recentAccuracyEl.innerHTML = html;
+}
+
+
+function attachWeakAreaHandlers() {
+  if (!categoryReportEl) return;
+  const buttons = categoryReportEl.querySelectorAll('.weak-practice-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.getAttribute('data-cat');
+      if (!code) return;
+      startCategoryPracticeFor(code);
+    });
+  });
+}
+
+
+function attachRetakeWrongHandler() {
+  if (!categoryReportEl) return;
+  const btn = categoryReportEl.querySelector('#retakeWrongBtn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+    if (!questions || questions.length === 0 || !wrongQuestionIndices || wrongQuestionIndices.size === 0) {
+      return;
+    }
+    // Build a new question sequence containing only the wrong questions
+    const indices = Array.from(wrongQuestionIndices);
+    if (indices.length === 0) return;
+
+    // Shuffle for variety
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = tmp;
+    }
+
+    selectionMode = 'wrongonly';
+    questionSequence = indices;
+    questionSequencePosition = 0;
+
+    // Reset exam stats for this retake session
+    totalAsked = 0;
+    totalCorrect = 0;
+    recentResults = [];
+    categoryStats = null;
+
+    statusEl.textContent = strings.statusRetakeWrong || '';
+    resetFeedback();
+    clearQuestion();
+    updateModeIndicator();
+    updateCategoryTrainingVisibility();
+    updateProgressUI();
+    showNextQuestion();
+  });
+}
+
+function startCategoryPracticeFor(categoryCode) {
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  if (!questions || questions.length === 0) {
+    statusEl.textContent = strings.statusNoFile;
+    return;
+  }
+
+  // Switch to category training mode
+  selectionMode = 'category';
+  if (modeCategoryRadio) modeCategoryRadio.checked = true;
+
+  // Rebuild category UI and select only this category
+  buildCategoryTrainingUI();
+  categorySelection = new Set([categoryCode]);
+  const checkboxes = document.querySelectorAll('.cat-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = (cb.value === categoryCode);
+    if (cb.checked) {
+      categorySelection.add(cb.value);
     }
   });
 
-  // If the chosen answer is wrong, mark that specific option in red
-  if (selectedIndex !== correctIndex) {
-    const wrongLabel = optionsEl.querySelector(`.option-label[data-index="${selectedIndex}"]`);
-    if (wrongLabel) {
-      wrongLabel.classList.add('incorrect');
-    }
-  }
+  statusEl.textContent = strings.loadedMessage.replace('{N}', questions.length);
 
-  if (selectedIndex === correctIndex) {
-    feedbackEl.textContent = 'Correct!';
-    feedbackEl.className = 'correct';
-    totalCorrect += 1;
-    if (selectionMode === 'exam' && q.category && categoryStats[q.category]) {
-      categoryStats[q.category].correct += 1;
-    }
-  } else {
-    feedbackEl.textContent = 'Incorrect.';
-    feedbackEl.className = 'incorrect';
-
-    // Track wrong question (store raw english version)
-    if (q.raw) {
-      wrongQuestions.push(q.raw);
-      updateWrongInfo();
-    }
-  }
-
-  totalAsked += 1;
-  updateScore();
-
-  const letters = ['A', 'B', 'C', 'D'];
-  const correctLetter = letters[correctIndex] || '';
-  const opts = getOptionsArray(q);
-
-  // Explanation text: show simple correct-answer line if no custom explanation
-  let expl = q.explanation || '';
-  if (!expl || expl.trim() === '') {
-    expl = `Correct answer: ${correctLetter}) ${opts[correctIndex]}`;
-  } else {
-    expl = `Correct answer: ${correctLetter}) ${opts[correctIndex]}\n\n${expl}`;
-  }
-
-  explanationEl.textContent = expl;
-
-  checkBtn.disabled = true;
-  nextBtn.disabled = false;
-
-  // In exam mode, when the last question has just been answered, render final category report
-  if (selectionMode === 'exam' &&
-      questionSequencePosition >= questionSequence.length) {
-    renderCategoryReport();
-  }
+  // Reset cycle for this focused training and show first question
+  resetQuestionSequence();
+  resetFeedback();
+  clearQuestion();
+  updateModeIndicator();
+  updateCategoryTrainingVisibility();
+  showNextQuestion();
 }
 
 function updateScore() {
-  if (totalAsked === 0) {
-    scoreEl.textContent = 'Score: 0 / 0 (0%)';
-    return;
-  }
-  const pct = Math.round((totalCorrect / totalAsked) * 100);
-  let status = '';
-  if (selectionMode === 'exam') {
-    if (pct >= 80) {
-      status = ' – Pass with Honours';
-    } else if (pct >= 70) {
-      status = ' – Pass';
+const sStrings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+if (totalAsked === 0) {
+scoreEl.textContent = `${sStrings.scorePrefix}: –`;
+if (categoryReportEl) {
+  categoryReportEl.innerHTML = '';
+}
+} else {
+const percent = ((totalCorrect / totalAsked) * 100).toFixed(1);
+let message = `${sStrings.scorePrefix}: ${totalCorrect} / ${totalAsked} (${percent}%)`;
+
+// Only show pass / honours result and category breakdown at the END of an exam
+if (
+  selectionMode === 'exam' &&
+  questionSequence &&
+  questionSequence.length > 0 &&
+  totalAsked === questionSequence.length
+) {
+  const p = parseFloat(percent);
+
+  // Official ISED-style wording, based on profile + language
+  if (examProfile === 'basic') {
+    if (currentLanguage === 'fr') {
+      if (p >= 80) {
+        message += ' — Qualification de base — Réussite avec mention : ' + percent + '%';
+      } else if (p >= 70) {
+        message += ' — Qualification de base — Réussite : ' + percent + '%';
+      } else {
+        message += ' — Qualification de base — Échec : ' + percent + '%';
+      }
     } else {
-      status = ' – Below passing grade';
+      if (p >= 80) {
+        message += ' — Basic Qualification — Pass with Honours: ' + percent + '%';
+      } else if (p >= 70) {
+        message += ' — Basic Qualification — Pass: ' + percent + '%';
+      } else {
+        message += ' — Basic Qualification — Fail: ' + percent + '%';
+      }
+    }
+  } else if (examProfile === 'advanced') {
+    if (currentLanguage === 'fr') {
+      if (p >= 70) {
+        message += ' — Qualification avancée — Réussite : ' + percent + '%';
+      } else {
+        message += ' — Qualification avancée — Échec : ' + percent + '%';
+      }
+    } else {
+      if (p >= 70) {
+        message += ' — Advanced Qualification — Pass: ' + percent + '%';
+      } else {
+        message += ' — Advanced Qualification — Fail: ' + percent + '%';
+      }
     }
   }
-  scoreEl.textContent = `Score: ${totalCorrect} / ${totalAsked} (${pct}%)${status}`;
-}
 
-function updateWrongInfo() {
-  if (!wrongQuestions.length) {
-    wrongInfoEl.textContent = 'You haven’t missed any questions yet.';
-    downloadWrongBtn.disabled = true;
-  } else {
-    wrongInfoEl.textContent = `You have missed ${wrongQuestions.length} question(s). You can download them as a CSV for review.`;
-    downloadWrongBtn.disabled = false;
-  }
-}
+  // Build category breakdown similar to ISED report
+  if (categoryReportEl && categoryStats) {
+    let html = `<h3>${sStrings.catBreakdownTitle}</h3>`;
+    html += '<table border="1" cellpadding="4" cellspacing="0">';
+    html += `<tr><th>${sStrings.catColCategory}</th><th>${sStrings.catColCorrect}</th><th>${sStrings.catColQuestions}</th><th>${sStrings.catColPercent}</th></tr>`;
 
-function downloadWrongQuestionsCsv() {
-  if (!wrongQuestions.length) return;
-
-  const header = [
-    'question',
-    'optionA',
-    'optionB',
-    'optionC',
-    'optionD',
-    'correctOption',
-    'explanation',
-    'BankQuestionID',
-    'Category'
-  ];
-
-  const rows = [header.join(',')];
-
-  wrongQuestions.forEach(q => {
-    const correctIndex = letterToIndex(q.correctLetter);
-    const correctOptionLetter = indexToLetter(correctIndex);
-    const cells = [
-      q.question || '',
-      q.optionA || '',
-      q.optionB || '',
-      q.optionC || '',
-      q.optionD || '',
-      correctOptionLetter,
-      (q.explanation || '').replace(/\r?\n/g, ' '),
-      q.bankID || '',
-      q.category || ''
-    ];
-
-    const escaped = cells.map(val => {
-      const s = val.toString();
-      if (s.includes('"') || s.includes(',') || s.includes('\n')) {
-        return '"' + s.replace(/"/g, '""') + '"';
+    const catInfo = getCurrentCategoryInfo();
+    const weakDetails = [];
+    for (const code in catInfo) {
+      const st = categoryStats[code] || { correct: 0, total: 0 };
+      const pct = st.total > 0 ? Math.round((st.correct / st.total) * 100) : 0;
+      const labelObj = catInfo[code];
+      const label = labelObj ? (labelObj[currentLanguage] || labelObj.en) : code;
+      html += `<tr>
+<td>${code} - ${label}</td>
+<td>${st.correct}</td>
+<td>${st.total}</td>
+<td>${pct}%</td>
+</tr>`;
+      if (st.total > 0 && pct < 70) {
+        weakDetails.push({ code, label, pct });
       }
-      return s;
-    });
+    }
 
-    rows.push(escaped.join(','));
-  });
+    html += '</table>';
 
-  const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'wrong_questions_review.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+    // Weak areas summary and spotlight
+    if (weakDetails.length > 0) {
+      const listText = weakDetails
+        .map(w => `${w.code} - ${w.label} (${w.pct}%)`)
+        .join(', ');
+      html += `<p><strong>${sStrings.weakAreasTitle}:</strong> ${listText}</p>`;
 
-function renderCategoryReport() {
-  if (!categoryReportEl || !categoryStats) return;
-  let totalQuestions = 0;
-  let totalCorrectLocal = 0;
+      // Spotlight with buttons
+      html += '<div id="weakAreasSpotlight">';
+      const badgePrefix = sStrings.weakBadgePrefix || '';
+      const btnLabel = sStrings.weakPracticeBtn || 'Practice only this category';
+      weakDetails.forEach(w => {
+        html += `<div class="weak-area-item">
+  <span class="weak-badge">❗ ${badgePrefix}${w.label} — ${w.pct}%</span>
+  <button type="button" class="weak-practice-btn" data-cat="${w.code}">${btnLabel}</button>
+</div>`;
+      });
+      html += '</div>';
+    } else {
+      html += `<p><strong>${sStrings.weakAreasTitle}:</strong> ${sStrings.weakAreasNone}</p>`;
+    }
 
-  for (const code in categoryStats) {
-    totalQuestions += categoryStats[code].total;
-    totalCorrectLocal += categoryStats[code].correct;
+    // Optionally offer a "retake wrong questions" exam built only from incorrect answers
+    if (wrongQuestionIndices && wrongQuestionIndices.size > 0) {
+      const wrongCount = wrongQuestionIndices.size;
+      html += `<h4>${sStrings.retakeWrongTitle}</h4>`;
+      html += `<p>${sStrings.retakeWrongDesc}</p>`;
+      html += `<p>${wrongCount} question(s) were answered incorrectly in this exam.</p>`;
+      html += `<button type="button" id="retakeWrongBtn">${sStrings.retakeWrongBtn}</button>`;
+    }
+
+    categoryReportEl.innerHTML = html;
+    attachWeakAreaHandlers();
+    attachRetakeWrongHandler();
   }
-
-  if (totalQuestions === 0) {
+} else {
+  // Not exam finished: clear category report in exam mode
+  if (selectionMode === 'exam' && categoryReportEl) {
     categoryReportEl.innerHTML = '';
-    return;
   }
-
-  let html = '<h3>Category Breakdown (Exam)</h3>';
-  html += '<table border="1" cellpadding="4" cellspacing="0">';
-  html += '<tr><th>Category</th><th>Correct</th><th>Questions</th><th>Percent</th></tr>';
-
-  for (const code in CATEGORY_INFO) {
-    const stats = categoryStats[code];
-    if (!stats) continue;
-    const catTotal = stats.total;
-    const catCorrect = stats.correct;
-    const pct = catTotal > 0 ? Math.round((catCorrect / catTotal) * 100) : 0;
-    html += `<tr><td>${code} - ${CATEGORY_INFO[code]}</td><td>${catCorrect}</td><td>${catTotal}</td><td>${pct}%</td></tr>`;
-  }
-
-  const overallPct = Math.round((totalCorrectLocal / totalQuestions) * 100);
-  html += `<tr><th>Overall</th><th>${totalCorrectLocal}</th><th>${totalQuestions}</th><th>${overallPct}%</th></tr>`;
-  html += '</table>';
-
-  categoryReportEl.innerHTML = html;
 }
+
+scoreEl.textContent = message;
+}
+}
+
+
+function resetFeedback() {
+feedbackEl.textContent = '';
+feedbackEl.className = '';
+explanationEl.innerHTML = '';
+}
+
+function clearQuestion() {
+bankQuestionIdEl.textContent = '';
+questionTextEl.innerHTML = '';
+optionsEl.innerHTML = '';
+questionCounterEl.textContent = '';
+}
+
+</script>
+<script>
+document.getElementById('darkToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark');
+});
+document.getElementById('mobileToggle').addEventListener('click',()=>{
+  isMobileMode = !isMobileMode;
+  document.body.classList.toggle('mobile-mode', isMobileMode);
+  const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
+  document.getElementById('mobileToggle').textContent = isMobileMode ? strings.mobileOff : strings.mobileOn;
+});
 </script>
 
+<div class="card" id="supportCard">
+  <h2 id="supportTitle">About &amp; Support</h2>
+  <p id="supportText">
+    This free bilingual HAM exam trainer was created to help students prepare using real-style questions,
+    official exam structures, and category statistics. If this app helps you, you can support future improvements.
+  </p>
+  <a id="supportButton" href="https://buymeacoffee.com/fabiolus" target="_blank" rel="noopener noreferrer"
+     style="display:inline-block;padding:8px 14px;border-radius:6px;border:1px solid #c98b00;
+            background:#ffd24d;color:#000;font-weight:bold;text-decoration:none;">
+    ☕ Buy me a coffee
+  </a>
+</div>
 </body>
 </html>
