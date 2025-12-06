@@ -726,14 +726,53 @@ body.mobile-mode #modeControls label {
 .floating-toggle.top-2 { top: 50px; }
 .floating-toggle.top-3 { top: 90px; }
 
+
+/* Visually hidden text for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  padding: 8px 12px;
+  background: #111827;
+  color: #f9fafb;
+  border-radius: 999px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  left: 12px;
+}
+
+/* Ensure high contrast theme respects skip link */
+body.theme-highcontrast .skip-link {
+  background: #000000;
+  color: #ffffff;
+}
+
 </style>
 </head>
 <body>
+<a href="#quizCard" id="skipToQuizLink" class="skip-link">Skip to quiz content</a>
 <button id="darkToggle" class="btn-ghost floating-toggle top-1">Dark Mode</button>
 <button id="mobileToggle" class="btn-ghost floating-toggle top-2">Mobile Mode</button>
 <button id="fullscreenToggle" class="btn-ghost floating-toggle top-3">Full screen</button>
 <h1>Amateur Radio Exam Practice</h1>
 
+<div id="appRoot" role="main">
 <div class="card">
   <p id="step1Text"><strong>Step 1:</strong> Choose your preferred language.</p>
   <div id="languageControls" style="margin-bottom:10px;">
@@ -765,7 +804,7 @@ body.mobile-mode #modeControls label {
 
   <input type="file" id="fileInput" accept=".csv,.txt">
   <p id="localFileNote" style="font-size:0.85rem; color:#555; margin-top:4px;">Use this option to load a local file.</p>
-  <div id="status">No file loaded.</div>
+  <div id="status" role="status" aria-live="polite">No file loaded.</div>
 
   <p id="step3Text"><strong>Step 3:</strong> Select the desired question mode (Random, No repeats, or Exam).</p>
   <div id="modeControls" style="margin-top:8px;">
@@ -811,7 +850,8 @@ body.mobile-mode #modeControls label {
   <p id="step4Text"><strong>Step 4:</strong> Click <em>Next Question</em> to start the quiz.</p>
 </div>
 
-<div class="card" id="quizCard" style="display:none;">
+<div class="card" id="quizCard" style="display:none;" role="region" aria-labelledby="quizHeading">
+<h2 id="quizHeading" class="sr-only">Quiz</h2>
 <div id="stickyQuestionHeader">
 <div id="questionHeader">
 <span id="questionCounter"></span>
@@ -829,11 +869,14 @@ body.mobile-mode #modeControls label {
 </div>
 <div id="questionText"></div>
 <form id="optionsForm">
-<div id="options"></div>
+  <fieldset id="optionsFieldset" aria-describedby="questionText">
+    <legend id="optionsLegend" class="sr-only">Answer choices</legend>
+    <div id="options"></div>
+  </fieldset>
 </form>
 
-<div id="feedback"></div>
-<div id="explanation"></div>
+<div id="feedback" aria-live="polite"></div>
+<div id="explanation" aria-live="polite"></div>
 
 <div class="controls">
 <button id="checkBtn" class="btn-primary">Check Answer</button>
@@ -844,6 +887,7 @@ body.mobile-mode #modeControls label {
 <div id="score"></div>
 <div id="memoryConsolidation"></div>
 <div id="categoryReport"></div>
+</div>
 </div>
 
 
@@ -1083,6 +1127,10 @@ const UI_STRINGS = {
     licenseFooterHtml: 'Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> &ndash; Non-commercial use only',
 fullScreenOn: 'Full screen',
 fullScreenOff: 'Exit full screen',
+    skipToQuizLabel: 'Skip to quiz content',
+    quizRegionLabel: 'Quiz',
+    answerChoicesLegend: 'Answer choices',
+
   },
   fr: {
     title: 'Pratique pour l’examen de radioamateur',
@@ -1169,7 +1217,10 @@ fullScreenOff: 'Exit full screen',
     downloadCsvBtn: 'Télécharger le CSV d’explications (depuis GitHub)',
     licenseFooterHtml: 'Sous licence <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> &ndash; Utilisation non commerciale uniquement',
     fullScreenOn: 'Plein écran',
-    fullScreenOff: 'Quitter le mode plein écran'
+    fullScreenOff: 'Quitter le mode plein écran',
+    skipToQuizLabel: 'Aller directement au contenu du quiz',
+    quizRegionLabel: 'Quiz',
+    answerChoicesLegend: 'Choix de réponse'
   }
 };
 function getLoadedMessageWithProfile(strings) {
@@ -1238,6 +1289,22 @@ function applyTheme() {
   body.classList.add(cls);
 }
 
+function updateToggleA11y() {
+  if (darkToggleBtn) {
+    const isDark = document.body.classList.contains('dark');
+    darkToggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  }
+  if (mobileToggleBtn) {
+    // isMobileMode is our canonical flag for mobile layout
+    mobileToggleBtn.setAttribute('aria-pressed', isMobileMode ? 'true' : 'false');
+  }
+  if (fullscreenToggleBtn) {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+    fullscreenToggleBtn.setAttribute('aria-pressed', isFs ? 'true' : 'false');
+  }
+}
+
+
 
 function toggleFullscreen() {
   const doc = document;
@@ -1265,6 +1332,18 @@ function toggleFullscreen() {
 function applyLanguage() {
   const strings = UI_STRINGS[currentLanguage] || UI_STRINGS.en;
   if (appTitleEl) appTitleEl.textContent = strings.title;
+  if (typeof document !== 'undefined' && document.title !== undefined) {
+    document.title = strings.title || document.title;
+  }
+  if (skipToQuizLinkEl && strings.skipToQuizLabel) {
+    skipToQuizLinkEl.textContent = strings.skipToQuizLabel;
+  }
+  if (quizHeadingEl && strings.quizRegionLabel) {
+    quizHeadingEl.textContent = strings.quizRegionLabel;
+  }
+  if (optionsLegendEl && strings.answerChoicesLegend) {
+    optionsLegendEl.textContent = strings.answerChoicesLegend;
+  }
   if (step1TextEl) step1TextEl.innerHTML = '<strong>' + strings.step1.split(':')[0] + ':</strong> ' + strings.step1.split(': ').slice(1).join(': ');
   if (step2TextEl) step2TextEl.innerHTML = '<strong>' + strings.step2.split(':')[0] + ':</strong> ' + strings.step2.split(': ').slice(1).join(': ');
   if (step3TextEl) step3TextEl.innerHTML = '<strong>' + strings.step3.split(':')[0] + ':</strong> ' + strings.step3.split(': ').slice(1).join(': ');
@@ -1399,6 +1478,32 @@ const categoryCheckboxesEl = document.getElementById('categoryCheckboxes');
 const categoryTrainingTitleEl = document.getElementById('categoryTrainingTitle');
 const categoryHintEl = document.getElementById('categoryHint');
 const githubNoteEl = document.getElementById('githubNote'); // NEW: GitHub note element
+const optionsLegendEl = document.getElementById('optionsLegend');
+const quizHeadingEl = document.getElementById('quizHeading');
+const skipToQuizLinkEl = document.getElementById('skipToQuizLink');
+
+// Initialize toggle ARIA state & hook click handlers for accessibility
+if (darkToggleBtn) {
+  darkToggleBtn.setAttribute('aria-pressed', document.body.classList.contains('dark') ? 'true' : 'false');
+  darkToggleBtn.addEventListener('click', () => {
+    // Let existing click logic run first, then sync ARIA state
+    setTimeout(updateToggleA11y, 0);
+  });
+}
+if (mobileToggleBtn) {
+  mobileToggleBtn.setAttribute('aria-pressed', isMobileMode ? 'true' : 'false');
+  mobileToggleBtn.addEventListener('click', () => {
+    setTimeout(updateToggleA11y, 0);
+  });
+}
+if (fullscreenToggleBtn) {
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+  fullscreenToggleBtn.setAttribute('aria-pressed', isFs ? 'true' : 'false');
+  fullscreenToggleBtn.addEventListener('click', () => {
+    setTimeout(updateToggleA11y, 0);
+  });
+  document.addEventListener('fullscreenchange', updateToggleA11y);
+}
 
 // Hook up language radio buttons
 if (langEnRadio && langFrRadio) {
@@ -2611,7 +2716,14 @@ function updateProgressUI() {
     progressLabelEl.textContent = `${labelBase}: ${totalAsked}`;
   }
 
+  const pctForAria = isNaN(percent) ? 0 : Math.round(percent);
   progressBarInnerEl.style.width = isNaN(percent) ? '0%' : percent + '%';
+  progressBarInnerEl.setAttribute('role', 'progressbar');
+  progressBarInnerEl.setAttribute('aria-valuemin', '0');
+  progressBarInnerEl.setAttribute('aria-valuemax', '100');
+  progressBarInnerEl.setAttribute('aria-valuenow', String(pctForAria));
+  progressBarInnerEl.setAttribute('aria-valuetext', pctForAria + '%');
+  progressBarInnerEl.setAttribute('aria-describedby', 'progressLabel');
 }
 
 
