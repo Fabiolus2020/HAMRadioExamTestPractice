@@ -2277,6 +2277,9 @@ function buildExamQuestionSequence() {
     }
   }
 
+  // NEW: Shuffle the entire exam set so categories stay at correct counts but appear in random order
+  shuffle(selected);
+
   // As a final safety, never exceed the total number of available questions.
   if (selected.length > questions.length) {
     return selected.slice(0, questions.length);
