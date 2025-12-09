@@ -271,7 +271,7 @@ Pour signaler un bogue, une suggestion ou une faute :
 - Utiliser le lien **« Signaler un problème »** dans l’application (section Support / pied de page), qui ouvre la page des issues GitHub avec le contexte nécessaire, ou  
 - Créer une issue directement sur le dépôt GitHub.
 
----
+----
 
 ## 📜 Licence (résumé)
 
